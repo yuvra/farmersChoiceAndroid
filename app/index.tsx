@@ -9,6 +9,7 @@ import {
     TouchableOpacity,
     ActivityIndicator,
     StyleSheet,
+    ToastAndroid,
 } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import firestore from "@react-native-firebase/firestore";
@@ -20,7 +21,8 @@ const categories = [
     { name: "Fungicides", icon: require("../assets/images/fungi_2.png") },
     { name: "Insecticides", icon: require("../assets/images/inst_2.png") },
     { name: "Herbicide", icon: require("../assets/images/herbis.png") },
-    { name: "Nutrients", icon: require("../assets/images/nutrients.png") },
+    { name: "Organic Farming", icon: require("../assets/images/splash_farmers_choice_1.png") },
+    // { name: "Nutrients", icon: require("../assets/images/nutrients.png") },
 ];
 
 const categoryMap: Record<string, string> = {
@@ -53,18 +55,21 @@ export default function AgriStore() {
 
         try {
             const queryKey = categoryMap[selectedCategory] || selectedCategory;
-            let query = firestore()
+
+            // 👉 Firestore query: filter + orderBy position
+            let q = firestore()
                 .collection("products")
                 .where("productType.en", "==", queryKey)
                 .where("showProduct", "==", true)
-                .orderBy("productName.en")
+                .orderBy("position", "asc") // <-- change here
                 .limit(10);
 
             if (!isInitial && lastVisibleDoc) {
-                query = query.startAfter(lastVisibleDoc);
+                q = q.startAfter(lastVisibleDoc);
             }
 
-            const snapshot = await query.get();
+            const snapshot = await q.get();
+
             const newProducts = snapshot.docs.map((doc) => ({
                 productId: doc.id,
                 ...doc.data(),
@@ -82,13 +87,15 @@ export default function AgriStore() {
                 setProducts(unique);
             }
 
-            if (snapshot.docs.length < 10) {
-                setHasMoreProducts(false);
-            }
-
+            setHasMoreProducts(snapshot.docs.length === 10);
             setLastVisibleDoc(snapshot.docs[snapshot.docs.length - 1] || null);
-        } catch (error) {
+        } catch (error: any) {
+            // If Firestore asks for a composite index, it will throw FAILED_PRECONDITION with a console link.
             console.error("Error fetching products:", error);
+            ToastAndroid?.show?.(
+                "Couldn’t load products. Please try again.",
+                ToastAndroid.SHORT
+            );
         } finally {
             setLoading(false);
         }

@@ -37,13 +37,13 @@ export default function ProductDetails() {
 
     // ✅ Set first variant every time the product changes
     useEffect(() => {
-        const variants = parsedProduct?.mapVariant;
-        if (Array.isArray(variants) && variants.length > 0) {
-            setSelectedVariant(variants[0]);
-        } else {
-            setSelectedVariant(null);
-        }
-    }, [product]);
+
+        const all = parsedProduct?.mapVariant || [];
+        const visible = all.filter((v: any) => v?.showVariant);
+        setSelectedVariant(visible.length ? visible[0] : null);
+
+        
+    }, [parsedProduct]);
 
     // Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
 

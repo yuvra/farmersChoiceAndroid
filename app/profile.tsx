@@ -1,28 +1,28 @@
-import React, { useState, useEffect, useRef } from "react";
-import {
-    View,
-    Text,
-    TextInput,
-    StyleSheet,
-    TouchableOpacity,
-    ToastAndroid,
-    ScrollView,
-    Image,
-    ActivityIndicator,
-    Animated,
-} from "react-native";
 import { useAgriStore } from "@/store/useAgriStore";
 import { db } from "@/utils/firebaseConfig";
-import {
-    collection,
-    query,
-    getDocs,
-    doc,
-    setDoc,
-    getDoc,
-} from "firebase/firestore";
 import auth from "@react-native-firebase/auth";
 import axios from "axios";
+import {
+    collection,
+    doc,
+    getDoc,
+    getDocs,
+    query,
+    setDoc,
+} from "firebase/firestore";
+import React, { useEffect, useRef, useState } from "react";
+import {
+    ActivityIndicator,
+    Animated,
+    Image,
+    ScrollView,
+    StyleSheet,
+    Text,
+    TextInput,
+    ToastAndroid,
+    TouchableOpacity,
+    View,
+} from "react-native";
 import * as Animatable from "react-native-animatable";
 
 export default function MobileVerificationScreen() {
@@ -153,7 +153,7 @@ export default function MobileVerificationScreen() {
 
     // ---------- Lambda client ----------
     const LAMBDA_API_BASE =
-        "https://l2rosu7sbeafj6rmenz4p2qd4i0owegl.lambda-url.ap-south-1.on.aws";
+        "https://zkpice43tw4g4omvgef6cwqerm0bwrmc.lambda-url.ap-south-1.on.aws";
 
     const infoMessage = "OTP sent! If SMS delays, you might get a quick call.";
 
@@ -183,8 +183,9 @@ export default function MobileVerificationScreen() {
         setOtp("");
         const phone = `+91${mobile}`.trim();
         const res = await client.post("/otp/send", { phone });
-
-        if (res.status === 200 && res.data?.ok) {
+        console.log("****response from Lambda:", res.data);
+        
+        if (res.status === 200 && res.data?.Status === "Success") {
             setConfirm(null); // not used for Lambda path
             setOtpSent(true);
             setSentVia("lambda");
