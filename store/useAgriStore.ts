@@ -1,7 +1,7 @@
 // store/useAgriStore.ts
+import AsyncStorage from "@react-native-async-storage/async-storage";
 import { create } from "zustand";
 import { persist, PersistStorage } from "zustand/middleware";
-import AsyncStorage from "@react-native-async-storage/async-storage";
 
 // Category type
 type Category =
@@ -9,6 +9,7 @@ type Category =
     | "Insecticides"
     | "Herbicides"
     | "Nutrients"
+    | "Organic"
     | null;
 
 type CartItem = {
@@ -37,6 +38,8 @@ export interface Product {
     productImages: string[];
     vendor: string;
     showProduct: boolean;
+    isOutOfStock: boolean;
+    position: number;
     chemicalComposition: string[];
     mapVariant: {
         title: {
@@ -93,7 +96,7 @@ type Store = {
 export const useAgriStore = create<Store>()(
     persist(
         (set, get) => ({
-            selectedCategory: 'Fungicides',
+            selectedCategory: 'Organic',
             setSelectedCategory: (category) =>
                 set({ selectedCategory: category }),
 

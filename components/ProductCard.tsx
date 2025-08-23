@@ -1,14 +1,13 @@
-import { AntDesign } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
 import React, { useRef } from "react";
 import {
-    View,
-    Text,
+    Animated,
+    Dimensions,
     Image,
     StyleSheet,
-    Dimensions,
+    Text,
     TouchableWithoutFeedback,
-    Animated,
+    View,
 } from "react-native";
 
 const { width } = Dimensions.get("window");
@@ -59,6 +58,36 @@ export default function ProductCard({ product }: any) {
         });
     };
 
+    console.log("***product", product);
+
+    const findIsShowVariantItemIndexFormMapVariant = (variant: any) => {
+        return variant.showVariant;
+    };
+
+    // Helper: pick the active variant once
+    const getActiveVariant = (p: any) => {
+        const mv = p?.mapVariant ?? [];
+        if (!Array.isArray(mv) || mv.length === 0) return null;
+
+        // showVariant can be boolean or string; treat truthy/"true" as active
+        const idx = mv.findIndex(
+            (v) => v?.showVariant === true || v?.showVariant === "true"
+        );
+
+        return mv[idx >= 0 ? idx : 0]; // fallback to first variant
+    };
+
+    // Memoize for this product
+    const activeVariant = React.useMemo(
+        () => getActiveVariant(product),
+        [product]
+    );
+
+    // Then use everywhere
+    const price = activeVariant?.price ?? 0;
+    const compareAt = activeVariant?.compareAtPrice ?? undefined;
+    const sizeTitle = activeVariant?.title?.en ?? "";
+
     return (
         <TouchableWithoutFeedback onPress={handlePress}>
             <Animated.View
@@ -104,25 +133,23 @@ export default function ProductCard({ product }: any) {
                 {/* Price */}
                 <View style={styles.priceRow}>
                     <Text style={styles.price}>
-                        ₹{product.mapVariant[0].price}
+                        {/* ₹{product.mapVariant[0].price} */}
+                        {price}
                     </Text>
                     <Text style={styles.strikePrice}>
-                        ₹{product.mapVariant[0].compareAtPrice}
+                        {/* ₹{product.mapVariant[0].compareAtPrice} */}
+                        {compareAt}
                     </Text>
                 </View>
 
                 {/* Saved Price */}
                 <Text style={styles.savedPrice}>
-                    💰 Saved ₹
-                    {product.mapVariant[0].compareAtPrice -
-                        product.mapVariant[0].price}
+                    💰 Saved ₹{compareAt - price}
                 </Text>
 
                 {/* Size */}
                 <View style={styles.sizeBox}>
-                    <Text style={styles.sizeText}>
-                        {product.mapVariant[0].title.en}
-                    </Text>
+                    <Text style={styles.sizeText}>{sizeTitle}</Text>
                 </View>
 
                 {/* Out of Stock Ribbon with Animation */}
@@ -232,7 +259,7 @@ const styles = StyleSheet.create({
     },
 
     ribbon: {
-        backgroundColor: "#ed9485",
+        backgroundColor: "#71BC78",
         position: "absolute",
         top: 14, // slightly above
         left: -30,
