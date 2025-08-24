@@ -4,15 +4,15 @@ import { useRouter } from "expo-router";
 import { doc, getDoc } from "firebase/firestore";
 import React, { useEffect, useState } from "react";
 import {
-    ActivityIndicator,
-    FlatList,
-    Image,
-    Modal,
-    ScrollView,
-    StyleSheet,
-    Text,
-    TouchableOpacity,
-    View,
+	ActivityIndicator,
+	FlatList,
+	Image,
+	Modal,
+	ScrollView,
+	StyleSheet,
+	Text,
+	TouchableOpacity,
+	View,
 } from "react-native";
 
 export default function MyOrdersScreen() {
@@ -51,6 +51,42 @@ export default function MyOrdersScreen() {
 		} finally {
 			setLoading(false);
 		}
+	};
+
+	const EmptyOrdersCard = ({
+		name,
+		phone,
+	}: {
+		name?: string;
+		phone?: string;
+	}) => {
+		const cap = (s?: string) =>
+			(s || "Friend")
+				.trim()
+				.toLowerCase()
+				.replace(/(^|\s)\S/g, (t) => t.toUpperCase());
+
+		return (
+			<TouchableOpacity
+				style={styles.emptyWrap}
+				onPress={()=>{router.push("/")}}
+				activeOpacity={1}
+			>
+				<View style={styles.emptyIconWrap}>
+					<Text style={styles.emptyIcon}>🛒</Text>
+				</View>
+
+				<Text style={styles.emptyTitle}>Hey {cap(name)} 👋</Text>
+
+				<Text style={styles.emptyBody}>
+					Start exploring the agri store today!
+				</Text>
+
+				<View style={styles.shopBtn}>
+					<Text style={styles.shopBtnText}>Shop Now</Text>
+				</View>
+			</TouchableOpacity>
+		);
 	};
 
 	if (!profile?.phone) {
@@ -151,7 +187,10 @@ export default function MyOrdersScreen() {
 					</TouchableOpacity>
 				)}
 				ListEmptyComponent={
-					<Text style={styles.emptyText}>No orders found.</Text>
+					<EmptyOrdersCard
+						name={profile?.name}
+						phone={profile?.phone}
+					/>
 				}
 				contentContainerStyle={{ padding: 16 }}
 			/>
@@ -352,5 +391,64 @@ const styles = StyleSheet.create({
 		padding: 12,
 		alignItems: "center",
 		borderRadius: 8,
+	},
+	emptyWrap: {
+		marginTop: 32,
+		marginHorizontal: 16,
+		backgroundColor: "#F4FBF5",
+		borderRadius: 16,
+		paddingVertical: 22,
+		paddingHorizontal: 18,
+		borderWidth: 1,
+		borderColor: "#E1F2E3",
+		alignItems: "center",
+		shadowColor: "#000",
+		shadowOpacity: 0.06,
+		shadowRadius: 8,
+		shadowOffset: { width: 0, height: 3 },
+		elevation: 2,
+	},
+	emptyIconWrap: {
+		width: 60,
+		height: 60,
+		borderRadius: 30,
+		backgroundColor: "#EAF7ED",
+		alignItems: "center",
+		justifyContent: "center",
+		marginBottom: 8,
+		borderWidth: 1,
+		borderColor: "#D8EEDD",
+	},
+	emptyIcon: { fontSize: 28 },
+	emptyTitle: {
+		fontSize: 16,
+		fontWeight: "800",
+		color: "#1B5E20",
+		textAlign: "center",
+	},
+	emptyPhone: { fontWeight: "800", color: "#2E7D32" },
+	emptyBody: {
+		fontSize: 14,
+		color: "#4B5563",
+		marginTop: 6,
+		marginBottom: 14,
+		textAlign: "center",
+		fontFamily: "Poppoins",
+	},
+	shopBtn: {
+		backgroundColor: "#2E7D32",
+		paddingVertical: 12,
+		paddingHorizontal: 20,
+		borderRadius: 999,
+		shadowColor: "#000",
+		shadowOpacity: 0.08,
+		shadowRadius: 4,
+		shadowOffset: { width: 0, height: 2 },
+		elevation: 2,
+	},
+	shopBtnText: {
+		color: "#fff",
+		fontWeight: "800",
+		fontSize: 14,
 	},
 });
