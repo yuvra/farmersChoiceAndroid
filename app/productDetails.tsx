@@ -131,7 +131,8 @@ export default function ProductDetails() {
 					<Text style={styles.buttonText}>Add to Cart</Text>
 				</TouchableOpacity>
 				<TouchableOpacity
-					style={styles.buyButton}
+					disabled={cartItemsItems.length == 0}
+					style={cartItemsItems.length == 0 ? styles.buyButtonDisabled : styles.buyButton}
 					onPress={() => {
 						if (parsedProduct && selectedVariant) {
 							// addToCart(parsedProduct, selectedVariant);
@@ -218,6 +219,12 @@ const styles = StyleSheet.create({
 	buyButton: {
 		flex: 1,
 		backgroundColor: "#388e3c",
+		paddingVertical: 16,
+		alignItems: "center",
+	},
+	buyButtonDisabled: {
+		flex: 1,
+		backgroundColor: "#a2a4a2ff",
 		paddingVertical: 16,
 		alignItems: "center",
 	},
